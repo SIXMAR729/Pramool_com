@@ -1,17 +1,17 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navItems = [
-    "Home",
-    "Auction",
-    "Classified",
-    "Member",
-    "Discuss",
-    "FAQ",
-    "Webboard",
+    { name: "Home", path: "/" },
+    { name: "Auction", path: "/auction" },
+    { name: "Classified", path: "/classified" },
+    { name: "Member", path: "/member" },
+    { name: "Discuss", path: "/discuss" },
+    { name: "FAQ", path: "/faq" },
+    { name: "Webboard", path: "/webboard" },
   ];
 
   return (
@@ -48,46 +48,52 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="bg-orange-400 hidden md:block">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex space-x-1">
-            {navItems.map((item) => (
-              <button
-                key={item}
-                className="px-4 py-2 text-sm font-medium hover:bg-orange-300 transition-colors"
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-        </div>
-      </nav>
+{/* Desktop Navigation */}
+<nav className="bg-orange-400 hidden md:block">
+  <div className="max-w-7xl mx-auto px-4">
+    <div className="flex space-x-1">
+      {navItems.map((item) => (
+        <Link
+          key={item.name}
+          to={item.path}
+          className="px-4 py-2 text-sm font-medium hover:bg-orange-300 transition-colors"
+        >
+          {item.name}
+        </Link>
+      ))}
+    </div>
+  </div>
+</nav>
 
-      {/* Mobile Dropdown Menu */}
-      {menuOpen && (
-        <nav className="bg-orange-400 md:hidden px-4">
-          <div className="flex flex-col space-y-1 py-2">
-            {navItems.map((item) => (
-              <button
-                key={item}
-                className="text-left px-4 py-2 text-sm font-medium hover:bg-orange-300 transition-colors"
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-        </nav>
-      )}
+{/* Mobile Dropdown Navigation*/}
+<nav
+  className={`bg-orange-400 md:hidden px-4 overflow-hidden transition-all duration-1000 ease-in-out ${
+    menuOpen ? 'max-h-96 opacity-100 py-2' : 'max-h-0 opacity-0 py-0'
+  }`}
+>
+  <div className="flex flex-col space-y-1">
+    {navItems.map((item) => (
+      <Link
+        key={item.name}
+        to={item.path}
+        className="text-left px-4 py-2 text-sm font-medium hover:bg-orange-300 transition-colors"
+        onClick={() => setMenuOpen(false)}
+      >
+        {item.name}
+      </Link>
+    ))}
+  </div>
+</nav>
+      
 
       {/* Right-side Wave */}
       <svg
-        className="absolute right-0 top-0 h-full w-32"
+        className="absolute right-0 top-0 h-full w-32 -z-10"
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
       >
         <path
-          d="M0,0 C50,50 50,50 0,100 L100,100 L100,0 Z"
+          d="M0,0 C50,50 50,50 0,100 L100,100 L100,0 Z -z-10"
           fill="white"
           opacity="0.1"
         />

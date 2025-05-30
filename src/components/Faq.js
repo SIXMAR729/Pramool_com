@@ -37,19 +37,30 @@ export default function FaqPage() {
           Frequently Asked Questions
         </h1>
 
-        {faqs.map((faq, index) => (
-          <div key={index} className="mb-4 border rounded-lg overflow-hidden shadow-sm bg-white">
-            <button
-              onClick={() => toggle(index)}
-              className="w-full text-left px-6 py-4 bg-orange-100 hover:bg-orange-200 transition-colors font-medium text-lg"
+        {faqs.map((faq, index) => {
+          const isOpen = openIndex === index;
+          return (
+            <div
+              key={index}
+              className="mb-4 border rounded-lg overflow-hidden shadow-sm bg-white transition-all"
             >
-              {faq.question}
-            </button>
-            {openIndex === index && (
-              <div className="px-6 py-4 bg-white text-gray-700">{faq.answer}</div>
-            )}
-          </div>
-        ))}
+              <button
+                onClick={() => toggle(index)}
+                className="w-full text-left px-6 py-4 bg-orange-100 hover:bg-orange-200 transition-colors font-medium text-lg"
+              >
+                {faq.question}
+              </button>
+
+              <div
+                className={`px-6 bg-white text-gray-700 transition-all duration-300 ease-in-out overflow-hidden ${
+                  isOpen ? "max-h-40 py-4" : "max-h-0 py-0"
+                }`}
+              >
+                <div>{faq.answer}</div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [loginName, setLoginName] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
