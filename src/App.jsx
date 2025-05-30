@@ -6,6 +6,7 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
 import RightSidebar from './components/RightSidebar';
+import Webboard from './components/Webboard';
 
 function App() {
   return (
@@ -16,6 +17,9 @@ function App() {
         <Sidebar />
         <MainContent />
         <RightSidebar />
+      </div>
+      <div className='flex max-w-full'>
+          <Webboard />
       </div>
     </div>
   );
