@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from '../contexts/AuthContext'; // Import useAuth
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, logout } = useAuth(); // Get user and logout function
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -23,6 +25,14 @@ const Header = () => {
             <span>Free service Thai online auction</span>
           </div>
           <div className="flex items-center space-x-4">
+            {user ? (
+              <>
+                <span className="font-bold">Welcome, {user.username}</span>
+                <button onClick={logout} className="hover:text-orange-200">Logout</button>
+              </>
+            ) : (
+              <Link to="/login" className="hover:text-orange-200">Login</Link>
+            )}
             <button className="hover:text-orange-200">contact webmaster</button>
           </div>
         </div>
@@ -48,42 +58,42 @@ const Header = () => {
         </div>
       </div>
 
-{/* Desktop Navigation */}
-<nav className="bg-orange-400 hidden md:block">
-  <div className="max-w-7xl mx-auto px-4">
-    <div className="flex space-x-1">
-      {navItems.map((item) => (
-        <Link
-          key={item.name}
-          to={item.path}
-          className="px-4 py-2 text-sm font-medium hover:bg-orange-300 transition-colors"
-        >
-          {item.name}
-        </Link>
-      ))}
-    </div>
-  </div>
-</nav>
+      {/* Desktop Navigation */}
+      <nav className="bg-orange-400 hidden md:block">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex space-x-1">
+            {navItems.map((item) => (
+              <Link
+                key={item.name}
+                to={item.path}
+                className="px-4 py-2 text-sm font-medium hover:bg-orange-300 transition-colors"
+              >
+                {item.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </nav>
 
-{/* Mobile Dropdown Navigation*/}
-<nav
-  className={`bg-orange-400 md:hidden px-4 overflow-hidden transition-all duration-1000 ease-in-out ${
-    menuOpen ? 'max-h-96 opacity-100 py-2' : 'max-h-0 opacity-0 py-0'
-  }`}
->
-  <div className="flex flex-col space-y-1">
-    {navItems.map((item) => (
-      <Link
-        key={item.name}
-        to={item.path}
-        className="text-left px-4 py-2 text-sm font-medium hover:bg-orange-300 transition-colors"
-        onClick={() => setMenuOpen(false)}
+      {/* Mobile Dropdown Navigation*/}
+      <nav
+        className={`bg-orange-400 md:hidden px-4 overflow-hidden transition-all duration-1000 ease-in-out ${
+          menuOpen ? 'max-h-96 opacity-100 py-2' : 'max-h-0 opacity-0 py-0'
+        }`}
       >
-        {item.name}
-      </Link>
-    ))}
-  </div>
-</nav>
+        <div className="flex flex-col space-y-1">
+          {navItems.map((item) => (
+            <Link
+              key={item.name}
+              to={item.path}
+              className="text-left px-4 py-2 text-sm font-medium hover:bg-orange-300 transition-colors"
+              onClick={() => setMenuOpen(false)}
+            >
+              {item.name}
+            </Link>
+          ))}
+        </div>
+      </nav>
       
 
       {/* Right-side Wave */}

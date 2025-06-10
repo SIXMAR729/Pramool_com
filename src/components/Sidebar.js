@@ -15,7 +15,7 @@ const Sidebar = () => {
     }
 
     console.log('Login Data:', { loginName, password, email });
-    setMessage('ล็อกอินสำเร็จ! (จำลอง)');
+    setMessage('ล็อกอินสำเร็จ! (จำลอง) '+ loginName);
   };
 
   return (

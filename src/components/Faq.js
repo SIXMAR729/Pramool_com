@@ -1,30 +1,24 @@
-import React, { useState } from "react";
-
-const faqs = [
-  {
-    question: "What is PRAMOOL.COM?",
-    answer:
-      "PRAMOOL.COM is a Thai online auction website offering free auction and classified services.",
-  },
-  {
-    question: "How do I participate in an auction?",
-    answer:
-      "To participate, create an account and start bidding on your desired items listed by other users.",
-  },
-  {
-    question: "Is there a fee for posting listings?",
-    answer:
-      "No, it's completely free to post auction and classified listings on PRAMOOL.COM.",
-  },
-  {
-    question: "How do I contact the webmaster?",
-    answer:
-      "You can contact the webmaster via the link at the top right of the site or through the contact form.",
-  },
-];
+import React, { useState, useEffect } from "react"; // Import useEffect
 
 export default function FaqPage() {
+  const [faqs, setFaqs] = useState([]); // Initialize with an empty array
   const [openIndex, setOpenIndex] = useState(null);
+
+  // useEffect to fetch data when the component mounts
+  useEffect(() => {
+    const fetchFaqs = async () => {
+      try {
+        // Fetch data from your new backend endpoint
+        const response = await fetch('http://localhost:3001/api/faq');
+        const data = await response.json();
+        setFaqs(data);
+      } catch (error) {
+        console.error("Failed to fetch FAQs:", error);
+      }
+    };
+
+    fetchFaqs();
+  }, []); // The empty dependency array [] means this effect runs once when the component mounts
 
   const toggle = (index) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -37,11 +31,12 @@ export default function FaqPage() {
           Frequently Asked Questions
         </h1>
 
+        {/* This part remains the same, but now it's populated with data from your API */}
         {faqs.map((faq, index) => {
           const isOpen = openIndex === index;
           return (
             <div
-              key={index}
+              key={faq.id} // Use the unique ID from the database
               className="mb-4 border rounded-lg overflow-hidden shadow-sm bg-white transition-all"
             >
               <button
