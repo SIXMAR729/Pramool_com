@@ -14,13 +14,13 @@ import Register from './components/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 import Discuss from './components/Discuss';
 import CreateDiscussion from './components/CreateDiscussion';
-import MemberPage from './components/MemberPage'; 
+import DiscussionDetail from './components/DiscussionDetail';
+import MemberPage from './components/MemberPage';
 import { AuthProvider } from './contexts/AuthContext';
 
 function Layout() {
   const location = useLocation();
-  
-  const hideLayout = ['/faq', '/webboard', '/login', '/register', '/discuss', '/discuss/new', '/member'].includes(location.pathname);
+  const hideLayout = ['/faq', '/webboard', '/login', '/register', '/discuss', '/discuss/new', '/member', '/discuss/:id'].includes(location.pathname);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -31,7 +31,6 @@ function Layout() {
         <Route path="/auction" element={<div>Auction Page</div>} />
         <Route path="/classified" element={<div>Classified Page</div>} />
         
-        {/* The /member route is now protected and will only render for admin users */}
         <Route path="/member" element={
           <ProtectedRoute adminOnly={true}>
             <MemberPage />
@@ -44,7 +43,10 @@ function Layout() {
             <CreateDiscussion />
           </ProtectedRoute>
         } />
+        <Route path="/discuss/:id" element={<DiscussionDetail />} />
+
         <Route path="/faq" element={<FAQ />} />
+        
         <Route 
           path="/webboard" 
           element={
@@ -53,13 +55,13 @@ function Layout() {
             </ProtectedRoute>
           } 
         />
+        
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>
 
       {!hideLayout && (
         <div className="flex max-w-full">
-          {/* MainContent is now rendered via the root route, so it's removed from here */}
           <RightSidebar />
         </div>
       )}

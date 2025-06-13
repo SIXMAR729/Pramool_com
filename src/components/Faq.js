@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react"; // Import useEffect
+import React, { useState, useEffect } from "react"; 
 
 export default function FaqPage() {
-  const [faqs, setFaqs] = useState([]); // Initialize with an empty array
+  const [faqs, setFaqs] = useState([]); 
   const [openIndex, setOpenIndex] = useState(null);
 
-  // useEffect to fetch data when the component mounts
+  
   useEffect(() => {
     const fetchFaqs = async () => {
       try {
@@ -18,7 +18,7 @@ export default function FaqPage() {
     };
 
     fetchFaqs();
-  }, []); // The empty dependency array [] means this effect runs once when the component mounts
+  }, []); 
 
   const toggle = (index) => {
     setOpenIndex(openIndex === index ? null : index);

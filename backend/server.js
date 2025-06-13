@@ -223,6 +223,41 @@ app.post('/api/discussions', authenticateToken, async (req, res) => {
     }
 });
 
+// Update a Discussion Post (Admin only)
+app.put('/api/discussions/:id', authenticateToken, requireAdmin, async (req, res) => {
+    const { title, category } = req.body;
+    const { id } = req.params;
+
+    if (!title || !category) {
+        return res.status(400).json({ error: 'Title and category are required' });
+    }
+
+    try {
+        await pool.query(
+            'UPDATE discussions SET title = ?, category = ? WHERE id = ?',
+            [title, category, id]
+        );
+        const [updatedPost] = await pool.query('SELECT d.id, d.title, d.category, d.replies, d.has_pic, d.is_hot, d.last_post_timestamp, u.username as author FROM discussions d JOIN users u ON d.user_id = u.id WHERE d.id = ?', [id]);
+        res.status(200).json(updatedPost[0]);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
+// Delete a Discussion Post (Admin only)
+app.delete('/api/discussions/:id', authenticateToken, requireAdmin, async (req, res) => {
+    const { id } = req.params;
+    try {
+        // The ON DELETE CASCADE in the DB schema will handle deleting associated replies.
+        await pool.query('DELETE FROM discussions WHERE id = ?', [id]);
+        res.status(200).json({ message: 'Discussion deleted successfully' });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
 // Get a single discussion post by ID
 app.get('/api/discussions/:id', async (req, res) => {
     try {

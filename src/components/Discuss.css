@@ -34,6 +34,7 @@
     padding: 6px;
     text-align: left;
     border-bottom: 1px solid #ddd;
+    vertical-align: middle;
 }
 
 .discuss-table th {
@@ -49,11 +50,18 @@
     background-color: #f9f9f9;
 }
 
-.status-col { width: 8%; text-align: center; }
-.topic-col { width: 50%; }
-.author-col { width: 15%; }
-.replies-col { width: 7%; text-align: center; }
-.lastpost-col { width: 20%; }
+.row-editing {
+    background-color: #fffbeA; /* A light yellow to indicate editing */
+}
+
+/* Adjusted column widths for the new Actions column */
+.status-col { width: 6%; text-align: center; }
+.topic-col { width: 44%; }
+.author-col { width: 12%; }
+.replies-col { width: 5%; text-align: center; }
+.lastpost-col { width: 18%; }
+.actions-col { width: 15%; text-align: center; }
+
 
 .status-old {
     color: #a0a0a0;
@@ -70,16 +78,49 @@
     font-weight: bold;
 }
 
-.topic-col a {
+.topic-link {
     color: #0000ff;
     text-decoration: none;
 }
 
-.topic-col a:hover {
+.topic-link:hover {
     text-decoration: underline;
 }
 
 .category {
     color: #555;
     margin-left: 5px;
+}
+
+/* New styles for action buttons */
+.action-btn {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    color: white;
+    border: none;
+    margin: 0 3px;
+    cursor: pointer;
+    min-width: 50px;
+}
+
+.action-btn.edit, .action-btn.save {
+    background-color: #4CAF50; /* Green */
+}
+
+.action-btn.delete, .action-btn.cancel {
+    background-color: #f44336; /* Red */
+}
+
+.action-btn:hover {
+    opacity: 0.9;
+}
+
+/* Styles for the inline editing form */
+.row-editing input {
+    width: 100%;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 13px;
 }
