@@ -9,33 +9,57 @@ import MainContent from './components/MainContent';
 import RightSidebar from './components/RightSidebar';
 import Webboard from './components/Webboard';
 import FAQ from './components/Faq';
-import Login from './components/Login'; // Standardized casing for consistency
+import Login from './components/Login';
 import Register from './components/Register';
+import ProtectedRoute from './components/ProtectedRoute';
+import Discuss from './components/Discuss';
+import CreateDiscussion from './components/CreateDiscussion';
+import MemberPage from './components/MemberPage'; 
 import { AuthProvider } from './contexts/AuthContext';
 
 function Layout() {
   const location = useLocation();
-  const hideLayout = ['/faq', '/webboard', '/login', '/register'].includes(location.pathname);
+  
+  const hideLayout = ['/faq', '/webboard', '/login', '/register', '/discuss', '/discuss/new', '/member'].includes(location.pathname);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
       <Sidebar />
       <Routes>
-        <Route path="/" element={<div>Home Page</div>} />
+        <Route path="/" element={<MainContent />} />
         <Route path="/auction" element={<div>Auction Page</div>} />
         <Route path="/classified" element={<div>Classified Page</div>} />
-        <Route path="/member" element={<div>Member Page</div>} />
-        <Route path="/discuss" element={<div>Discuss Page</div>} />
+        
+        {/* The /member route is now protected and will only render for admin users */}
+        <Route path="/member" element={
+          <ProtectedRoute adminOnly={true}>
+            <MemberPage />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/discuss" element={<Discuss />} />
+        <Route path="/discuss/new" element={
+          <ProtectedRoute>
+            <CreateDiscussion />
+          </ProtectedRoute>
+        } />
         <Route path="/faq" element={<FAQ />} />
-        <Route path="/webboard" element={<Webboard />} />
+        <Route 
+          path="/webboard" 
+          element={
+            <ProtectedRoute>
+              <Webboard />
+            </ProtectedRoute>
+          } 
+        />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>
 
       {!hideLayout && (
         <div className="flex max-w-full">
-          <MainContent />
+          {/* MainContent is now rendered via the root route, so it's removed from here */}
           <RightSidebar />
         </div>
       )}

@@ -1,0 +1,61 @@
+.post-page-container {
+    font-family: 'Tahoma', sans-serif;
+    font-size: 14px;
+    width: 90%;
+    margin: 20px auto;
+    background-color: #FFF;
+}
+
+.post-page-title {
+    background-color: #FF6600;
+    color: white;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.reply-container {
+    display: flex;
+    border: 1px solid #D1D1D1;
+    margin-top: -1px; /* To make borders overlap */
+}
+
+.user-info {
+    width: 150px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-right: 1px solid #D1D1D1;
+    text-align: center;
+}
+
+.user-info .username {
+    font-weight: bold;
+    color: #0000ff;
+}
+
+.user-info .user-role {
+    font-size: 12px;
+    color: #555;
+    margin-top: 5px;
+}
+
+.reply-content {
+    flex-grow: 1;
+    padding: 10px;
+}
+
+.reply-header {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 15px;
+}
+
+.reply-header a {
+    color: #0000ff;
+    text-decoration: none;
+    margin-left: 20px;
+}
+
+.reply-body {
+    line-height: 1.6;
+}

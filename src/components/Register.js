@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
+
 const Register = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -12,11 +13,16 @@ const Register = () => {
         e.preventDefault();
         setError('');
 
-        try {
+
+                 try {
             const response = await fetch('http://localhost:3001/api/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, email }),
+                body: JSON.stringify({ 
+                    username: username.trim(), 
+                    password: password.trim(), 
+                    email: email.trim() 
+                }),
             });
             const data = await response.json();
 

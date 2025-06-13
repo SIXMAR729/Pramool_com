@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+
 
 const Login = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -16,9 +17,14 @@ const Login = () => {
         setError('');
 
         const url = isLogin ? '/api/login' : '/api/register';
-        const body = isLogin ? { username, password } : { username, password, email };
+        
+       
+        const body = isLogin 
+            ? { username: username.trim(), password: password.trim() } 
+            : { username: username.trim(), password: password.trim(), email: email.trim() };
 
-        try {
+
+                    try {
             const response = await fetch(`http://localhost:3001${url}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -36,6 +42,8 @@ const Login = () => {
             } else {
                 alert('Registration successful! Please log in.');
                 setIsLogin(true);
+                // Clear fields for login
+                setPassword('');
             }
         } catch (err) {
             setError(err.message);
@@ -64,11 +72,11 @@ const Login = () => {
                         <label className="block text-sm font-medium text-gray-700">Password</label>
                         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full p-2 mt-1 border rounded" />
                     </div>
-                    <button type="submit" className="w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700">
+                    <button type="submit" className="w-full py-2 px-4 bg-orange-500 text-white rounded hover:bg-orange-600 transition-all">
                         {isLogin ? 'Login' : 'Register'}
                     </button>
                 </form>
-                <button onClick={() => setIsLogin(!isLogin)} className="w-full text-sm text-center text-blue-600 hover:underline">
+                <button onClick={() => setIsLogin(!isLogin)} className="w-full text-sm text-center text-orange-500 hover:underline">
                     {isLogin ? 'Need an account? Register' : 'Already have an account? Login'}
                 </button>
             </div>

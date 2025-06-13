@@ -25,7 +25,7 @@ export default function FaqPage() {
   };
 
   return (
-    <div className="min-h-screen bg-orange-50 text-gray-800 py-12 px-4">
+    <div className="min-h-screen bg-white text-gray-800 py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-4xl font-bold text-center text-orange-600 mb-8">
           Frequently Asked Questions

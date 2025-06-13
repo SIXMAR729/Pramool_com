@@ -7,7 +7,6 @@ const jwt = require('jsonwebtoken');
 const app = express();
 const port = 3001;
 const JWT_SECRET = 'your_super_secret_key_change_this'; // Use a more secure key in production
-
 // --- MySQL Database Connection ---
 const pool = mysql.createPool({
   host: 'localhost',
@@ -35,6 +34,17 @@ const authenticateToken = (req, res, next) => {
         next();
     });
 };
+
+//  check for admin role
+const requireAdmin = (req, res, next) => {
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ error: 'Admin access required' });
+    }
+    next();
+};
+
+
+
 
 
 // --- API Endpoints ---
@@ -68,23 +78,35 @@ app.post('/api/login', async (req, res) => {
     if (!username || !password) {
         return res.status(400).json({ error: 'Username and password are required' });
     }
+
     try {
         const [users] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
         if (users.length === 0) {
+            console.log(`Login attempt failed: User '${username}' not found.`);
             return res.status(401).json({ error: 'Invalid credentials' });
         }
+
         const user = users[0];
         const isMatch = await bcrypt.compare(password, user.password_hash);
+
+        // --- DEBUGGING LOGS ---
+        console.log(`Login attempt for user: '${username}'`);
+        console.log(`Password received: '${password}'`);
+        console.log(`Password hash from DB: '${user.password_hash}'`);
+        console.log('Password match result:', isMatch);
+        // --- END DEBUGGING LOGS ---
+
         if (!isMatch) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
-        const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
-        res.json({ token, user: { id: user.id, username: user.username } });
+        const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+        res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server Error");
     }
 });
+
 
 
 // Get all FAQs
@@ -163,6 +185,135 @@ app.put('/api/webboard/:id', authenticateToken, async (req, res) => {
         const [updatedPostRows] = await pool.query('SELECT p.id, p.user_id, p.message, p.created_at, u.username as user FROM webboard_posts p JOIN users u ON p.user_id = u.id WHERE p.id = ?', [postId]);
         res.json(updatedPostRows[0]);
 
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
+// Get all Discussion Posts
+app.get('/api/discussions', async (req, res) => {
+    try {
+        const query = `
+            SELECT d.id, d.title, d.category, d.replies, d.has_pic, d.is_hot,
+                   d.last_post_timestamp, u.username as author
+            FROM discussions d
+            JOIN users u ON d.user_id = u.id
+            ORDER BY d.last_post_timestamp DESC
+        `;
+        const [rows] = await pool.query(query);
+        res.json(rows);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
+// Create a new Discussion Post (Protected)
+app.post('/api/discussions', authenticateToken, async (req, res) => {
+    const { title, category, has_pic } = req.body;
+    const { id: userId } = req.user;
+    if (!title || !category) return res.status(400).json({ error: 'Title and category are required' });
+    try {
+        const [result] = await pool.query('INSERT INTO discussions (user_id, title, category, has_pic) VALUES (?, ?, ?, ?)', [userId, title, category, has_pic ? 1 : 0]);
+        res.status(201).json({ message: 'Discussion created successfully', discussionId: result.insertId });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
+// Get a single discussion post by ID
+app.get('/api/discussions/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const query = `
+            SELECT d.id, d.title, d.content, d.category, u.username as author, d.created_at
+            FROM discussions d
+            JOIN users u ON d.user_id = u.id
+            WHERE d.id = ?
+        `;
+        const [rows] = await pool.query(query, [id]);
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Discussion not found' });
+        }
+        res.json(rows[0]);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
+// Get all replies for a discussion post
+app.get('/api/discussions/:id/replies', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const query = `
+            SELECT r.id, r.content, r.created_at, u.username as author, u.role
+            FROM discussion_replies r
+            JOIN users u ON r.user_id = u.id
+            WHERE r.discussion_id = ?
+            ORDER BY r.created_at ASC
+        `;
+        const [rows] = await pool.query(query, [id]);
+        res.json(rows);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
+// Post a new reply to a discussion (Protected)
+app.post('/api/discussions/:id/replies', authenticateToken, async (req, res) => {
+    const { id: discussionId } = req.params;
+    const { id: userId } = req.user;
+    const { content } = req.body;
+
+    if (!content) {
+        return res.status(400).json({ error: 'Reply content cannot be empty' });
+    }
+
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+
+        // Insert the new reply
+        const [replyResult] = await connection.query(
+            'INSERT INTO discussion_replies (discussion_id, user_id, content) VALUES (?, ?, ?)',
+            [discussionId, userId, content]
+        );
+        const newReplyId = replyResult.insertId;
+
+        // Update the reply count and last post timestamp on the parent discussion
+        await connection.query(
+            'UPDATE discussions SET replies = replies + 1, last_post_timestamp = NOW() WHERE id = ?',
+            [discussionId]
+        );
+
+        // Fetch the newly created reply to return to the client
+        const [newReplyRows] = await connection.query(`
+            SELECT r.id, r.content, r.created_at, u.username as author, u.role
+            FROM discussion_replies r
+            JOIN users u ON r.user_id = u.id
+            WHERE r.id = ?
+        `, [newReplyId]);
+
+        await connection.commit();
+        res.status(201).json(newReplyRows[0]);
+    } catch (err) {
+        await connection.rollback();
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    } finally {
+        connection.release();
+    }
+});
+
+// Get all users (Admin only)
+app.get('/api/users', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const [rows] = await pool.query('SELECT id, username, email, role, created_at FROM users ORDER BY created_at DESC');
+        res.json(rows);
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server Error");
