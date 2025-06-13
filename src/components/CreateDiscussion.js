@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 const CreateDiscussion = () => {
     const [title, setTitle] = useState('');
+    const [content, setContent] = useState('')
     const [category, setCategory] = useState('pda'); // Default category
     const [hasPic, setHasPic] = useState(false);
     const [error, setError] = useState('');
@@ -22,7 +23,7 @@ const CreateDiscussion = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({ title, category, has_pic: hasPic }),
+                body: JSON.stringify({ title, category, content, has_pic: hasPic }),
             });
 
             const data = await response.json();
@@ -66,6 +67,17 @@ const CreateDiscussion = () => {
                             <option value="spo">Sports</option>
                             <option value="etc">Etc.</option>
                         </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Content</label>
+                        <input
+                            type="text"
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
+                            required
+                            className="w-full p-4 mt-1 border rounded"
+                            placeholder="Enter the content of your topic"
+                        />
                     </div>
                     <div className="flex items-center">
                         <input

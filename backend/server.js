@@ -205,19 +205,27 @@ app.get('/api/discussions', async (req, res) => {
     }
 });
 
-// Create a new Discussion Post (Protected)
+// Create a new Discussion Post - UPDATED to include content
 app.post('/api/discussions', authenticateToken, async (req, res) => {
-    const { title, category, has_pic } = req.body;
+    const { title, category, has_pic, content } = req.body;
     const { id: userId } = req.user;
-    if (!title || !category) return res.status(400).json({ error: 'Title and category are required' });
+
+    if (!title || !category || !content) {
+        return res.status(400).json({ error: 'Title, category, and content are required' });
+    }
+
     try {
-        const [result] = await pool.query('INSERT INTO discussions (user_id, title, category, has_pic) VALUES (?, ?, ?, ?)', [userId, title, category, has_pic ? 1 : 0]);
+        const [result] = await pool.query(
+            'INSERT INTO discussions (user_id, title, category, has_pic, content) VALUES (?, ?, ?, ?, ?)',
+            [userId, title, category, has_pic ? 1 : 0, content]
+        );
         res.status(201).json({ message: 'Discussion created successfully', discussionId: result.insertId });
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server Error");
     }
 });
+
 
 // Update a Discussion Post (Admin only)
 app.put('/api/discussions/:id', authenticateToken, requireAdmin, async (req, res) => {
