@@ -120,11 +120,13 @@ app.get('/api/faq', async (req, res) => {
   }
 });
 
-// Get all webboard posts
+// Get all Webboard Posts - UPDATED to include profile_image_url
 app.get('/api/webboard', async (req, res) => {
     try {
         const query = `
-            SELECT p.id, p.user_id, p.message, p.created_at, u.username as user
+            SELECT 
+                p.id, p.user_id, p.message, p.created_at, 
+                u.username as user, u.profile_image_url 
             FROM webboard_posts p
             JOIN users u ON p.user_id = u.id
             ORDER BY p.created_at ASC
@@ -137,20 +139,22 @@ app.get('/api/webboard', async (req, res) => {
     }
 });
 
-// Create a new webboard post (Protected)
+// Create a Webboard Post - UPDATED to remove image_url
 app.post('/api/webboard', authenticateToken, async (req, res) => {
     const { message } = req.body;
     const { id: userId, username } = req.user;
-    if (!message) {
-        return res.status(400).json({ error: 'Message is required' });
-    }
+    if (!message) return res.status(400).json({ error: 'Message is required' });
     try {
+        // The image_url is no longer part of this table
         const [result] = await pool.query(
             'INSERT INTO webboard_posts (user_id, username, message) VALUES (?, ?, ?)',
             [userId, username, message]
         );
-        const newPostId = result.insertId;
-        const [newPostRows] = await pool.query('SELECT p.id, p.user_id, p.message, p.created_at, u.username as user FROM webboard_posts p JOIN users u ON p.user_id = u.id WHERE p.id = ?', [newPostId]);
+        const [newPostRows] = await pool.query(`
+            SELECT p.id, p.user_id, p.message, p.created_at, u.username as user, u.profile_image_url 
+            FROM webboard_posts p JOIN users u ON p.user_id = u.id WHERE p.id = ?`, 
+            [result.insertId]
+        );
         res.status(201).json(newPostRows[0]);
     } catch (err) {
         console.error(err.message);
@@ -158,33 +162,25 @@ app.post('/api/webboard', authenticateToken, async (req, res) => {
     }
 });
 
-// Update a webboard post (Protected)
+// Update a Webboard Post - UPDATED to remove image_url
 app.put('/api/webboard/:id', authenticateToken, async (req, res) => {
     const { message } = req.body;
     const { id: postId } = req.params;
-    const { id: userId } = req.user;
-
-    if (!message) {
-        return res.status(400).json({ error: 'Message is required' });
-    }
-
+    const { id: userId, role } = req.user;
+    if (!message) return res.status(400).json({ error: 'Message is required' });
     try {
-        // First, verify the user owns the post
         const [posts] = await pool.query('SELECT user_id FROM webboard_posts WHERE id = ?', [postId]);
-        if (posts.length === 0) {
-            return res.status(404).json({ error: 'Post not found' });
-        }
-        if (posts[0].user_id !== userId) {
-            return res.status(403).json({ error: 'You are not authorized to edit this post' });
-        }
-
-        // Update the post
+        if (posts.length === 0) return res.status(404).json({ error: 'Post not found' });
+        if (posts[0].user_id !== userId && role !== 'admin') return res.status(403).json({ error: 'You are not authorized to edit this post' });
+        
         await pool.query('UPDATE webboard_posts SET message = ? WHERE id = ?', [message, postId]);
-
-        // Fetch and return the updated post
-        const [updatedPostRows] = await pool.query('SELECT p.id, p.user_id, p.message, p.created_at, u.username as user FROM webboard_posts p JOIN users u ON p.user_id = u.id WHERE p.id = ?', [postId]);
+        
+        const [updatedPostRows] = await pool.query(`
+            SELECT p.id, p.user_id, p.message, p.created_at, u.username as user, u.profile_image_url 
+            FROM webboard_posts p JOIN users u ON p.user_id = u.id WHERE p.id = ?`, 
+            [postId]
+        );
         res.json(updatedPostRows[0]);
-
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server Error");

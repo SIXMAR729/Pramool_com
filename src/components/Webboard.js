@@ -115,14 +115,18 @@ const Webboard = () => {
 
   // If the user is logged in, show the full webboard.
   return (
-    <div className="webboard-container">
+  <div className="webboard-container">
       <h2 className="board-title">Palm Board (หน้าแรก)</h2>
       <div className="posts-container" ref={postsContainerRef}>
         {posts.map((post, index) => (
           <div key={post.id} id={`post-${post.id}`} className={`post-item ${index % 2 === 1 ? 'bg-gray-100' : 'bg-white'}`}>
             <div className="post-header flex items-center justify-between">
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-gray-400 rounded-full mr-3 flex-shrink-0"></div>
+                <img 
+                    src={post.profile_image_url || 'https://placehold.co/40x40/cccccc/ffffff?text=User'} 
+                    alt={post.user}
+                    className="w-8 h-8 rounded-full mr-3 flex-shrink-0 object-cover"
+                />
                 <div>
                   <span className="font-bold text-orange-600">{post.user}</span>
                   <span className="text-gray-500 text-sm ml-2">[ {new Date(post.created_at).toLocaleString('th-TH')} ]</span>
@@ -136,20 +140,16 @@ const Webboard = () => {
             </div>
             <div className="post-content mt-2">
               {editingPostId === post.id ? (
-                <div className="edit-form">
-                  <textarea
-                    value={editingText}
-                    onChange={(e) => setEditingText(e.target.value)}
-                    className="w-full p-2 border rounded"
-                    rows="3"
-                  />
+                // Editing form no longer includes an image URL field
+                <div className="edit-form space-y-2">
+                  <textarea value={editingText} onChange={(e) => setEditingText(e.target.value)} className="w-full p-2 border rounded" rows="3" />
                   <div className="mt-2">
-                    <button onClick={() => handleUpdatePost(post.id)} className="bg-green-500 text-white px-3 py-1 rounded text-sm mr-2">Save</button>
+                    <button onClick={() => handleUpdatePost(post.id)} className="bg-orange-500 text-white px-3 py-1 rounded text-sm mr-2">Save</button>
                     <button onClick={handleCancelEdit} className="bg-gray-500 text-white px-3 py-1 rounded text-sm">Cancel</button>
                   </div>
                 </div>
               ) : (
-                post.message
+                <p>{post.message}</p>
               )}
             </div>
           </div>

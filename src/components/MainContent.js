@@ -1,9 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+
 
 const MainContent = () => {
+  const [recentPosts, setRecentPosts] = useState([]);
+
+  useEffect(() => {
+    // Fetch the most recent discussion posts
+    const fetchRecentPosts = async () => {
+      try {
+        const response = await fetch(`http://localhost:3001/api/discussions`);
+        const data = await response.json();
+        // We only want to show the top 3 most recent posts
+        setRecentPosts(data.slice(0, 3));
+      } catch (error) {
+        console.error("Failed to fetch recent posts:", error);
+      }
+    };
+
+    fetchRecentPosts();
+  }, []);
+
   return (
     <div className="flex-1 p-4 space-y-6">
-      {/* Audio Player */}
+      {/* Audio Player Section (no changes) */}
       <div className="bg-gray-800 text-white p-4 rounded-lg flex items-center space-x-4">
         <div className="relative">
         </div>
@@ -18,23 +38,19 @@ const MainContent = () => {
         </div>
       </div>
 
-      {/* What's New Section */}
+      {/* What's New Section (no changes) */}
       <div className="bg-white rounded-lg shadow-md p-4">
         <h2 className="text-lg font-bold text-gray-800 mb-4">What's new</h2>
-        
         <div className="space-y-4">
           <div className="text-center text-red-600 font-medium">
             ปนาโดแง่งเดือมาต ถ้าขีอยิ่นขี่ไปเลอมกับขีอให้ปัดประขายแนงิ่งให้ทาง
           </div>
-          
           <div className="text-center text-red-600">
             เน็น
           </div>
-          
           <div className="text-center text-red-600">
             ข็จาปิพ สอนประกาศให้นอกรอบ ควรระงังสินค้านอกรอบ
           </div>
-          
           <div className="border-l-4 border-red-500 pl-4">
             <div className="flex items-center space-x-2">
               <span className="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">
@@ -50,8 +66,9 @@ const MainContent = () => {
         </div>
       </div>
 
-      {/* Auction Listings */}
+      {/* Grid container for auctions and recent posts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Featured Auctions (no changes) */}
         <div className="bg-white rounded-lg shadow-md p-4">
           <h3 className="font-bold text-gray-800 mb-3">Featured Auctions</h3>
           <div className="space-y-3">
@@ -71,17 +88,24 @@ const MainContent = () => {
           </div>
         </div>
 
+        {/* UPDATED: Recent Posts section */}
         <div className="bg-white rounded-lg shadow-md p-4">
           <h3 className="font-bold text-gray-800 mb-3">Recent Posts</h3>
           <div className="space-y-3">
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="p-2 border border-gray-200 rounded">
-                <div className="text-sm font-medium">กระทู้ #{item}</div>
-                <div className="text-xs text-gray-600 mt-1">
-                  โพสต์โดย: สมาชิก{item} | 2 ชั่วโมงที่แล้ว
+            {recentPosts.length > 0 ? (
+              recentPosts.map((post) => (
+                <div key={post.id} className="p-2 border border-gray-200 rounded hover:bg-gray-50 transition-colors">
+                  <Link to={`/discuss/${post.id}`} className="text-sm font-medium text-blue-600 hover:underline">
+                    {post.title}
+                  </Link>
+                  <div className="text-xs text-gray-600 mt-1">
+                    Posted by: {post.author} | {new Date(post.last_post_timestamp).toLocaleDateString()}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-xs text-gray-500">No recent posts to display.</p>
+            )}
           </div>
         </div>
       </div>
