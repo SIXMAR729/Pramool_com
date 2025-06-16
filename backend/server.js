@@ -359,6 +359,26 @@ app.get('/api/users', authenticateToken, requireAdmin, async (req, res) => {
     }
 });
 
+// Get all auctions
+app.get('/api/auctions', async (req, res) => {
+    try {
+        const query = `
+            SELECT 
+                a.id, a.title, a.description, a.starting_price, 
+                a.current_price, a.end_time, a.image_url, u.username as seller
+            FROM auctions a
+            JOIN users u ON a.user_id = u.id
+            ORDER BY a.end_time ASC
+        `;
+        const [rows] = await pool.query(query);
+        res.json(rows);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
+
 
 // --- Start the Server ---
 app.listen(port, () => {

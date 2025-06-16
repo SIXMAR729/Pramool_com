@@ -16,11 +16,13 @@ import Discuss from './components/Discuss';
 import CreateDiscussion from './components/CreateDiscussion';
 import DiscussionDetail from './components/DiscussionDetail';
 import MemberPage from './components/MemberPage';
+import AuctionPage from './components/AuctionPage'; // Import the new AuctionPage component
 import { AuthProvider } from './contexts/AuthContext';
 
 function Layout() {
   const location = useLocation();
-  const hideLayout = ['/faq', '/webboard', '/login', '/register', '/discuss', '/discuss/new', '/member', '/discuss/:id'].includes(location.pathname);
+  // Add '/auction' to the list of pages that use a full-screen layout
+  const hideLayout = ['/faq', '/webboard', '/login', '/register', '/discuss', '/discuss/new', '/member', '/discuss/:id', '/auction'].includes(location.pathname);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -28,7 +30,10 @@ function Layout() {
       <Sidebar />
       <Routes>
         <Route path="/" element={<MainContent />} />
-        <Route path="/auction" element={<div>Auction Page</div>} />
+        
+        {/* The /auction route now renders the AuctionPage component */}
+        <Route path="/auction" element={<AuctionPage />} />
+        
         <Route path="/classified" element={<div>Classified Page</div>} />
         
         <Route path="/member" element={
@@ -36,7 +41,7 @@ function Layout() {
             <MemberPage />
           </ProtectedRoute>
         } />
-
+        
         <Route path="/discuss" element={<Discuss />} />
         <Route path="/discuss/new" element={
           <ProtectedRoute>
@@ -47,9 +52,7 @@ function Layout() {
 
         <Route path="/faq" element={<FAQ />} />
         
-        <Route 
-          path="/webboard" 
-          element={
+        <Route path="/webboard" element={
             <ProtectedRoute>
               <Webboard />
             </ProtectedRoute>
