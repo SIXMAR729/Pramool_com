@@ -36,7 +36,7 @@ const Header = () => {
               <path d="M0 0 C0.33 1.32 0.66 2.64 1 4 C-1.97 6.475 -1.97 6.475 -5 9 C-4.42647107 5.12867972 -2.51295648 2.91827204 0 0 Z " fill="#949494" transform="translate(29,12)" />
               <path d="M0 0 C2.3125 0.1875 2.3125 0.1875 4 1 C-0.39453125 5.00390625 -0.39453125 5.00390625 -2 6 C-2.99 5.67 -3.98 5.34 -5 5 C-2.75 2.4375 -2.75 2.4375 0 0 Z " fill="#949494" transform="translate(16,2)" />
             </svg>
-            <span className="text-2xl sm:text-3xl font-bold text-orange-500">Jarool.COM</span>
+            <span className="text-2xl sm:text-3xl font-bold text-orange-500">Pramool.com</span>
           </div>
 
           {/* Desktop User Info / Login Link */}

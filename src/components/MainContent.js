@@ -43,13 +43,13 @@ const MainContent = () => {
         <h2 className="text-lg font-bold text-gray-800 mb-4">What's new</h2>
         <div className="space-y-4">
           <div className="text-center text-red-600 font-medium">
-            ปนาโดแง่งเดือมาต ถ้าขีอยิ่นขี่ไปเลอมกับขีอให้ปัดประขายแนงิ่งให้ทาง
+            ระวังมิจฉาชีพ
           </div>
           <div className="text-center text-red-600">
             เน็น
           </div>
           <div className="text-center text-red-600">
-            ข็จาปิพ สอนประกาศให้นอกรอบ ควรระงังสินค้านอกรอบ
+            ระวังมิจฉาชีพ สอนประกาศให้นอกรอบ ควรระงับสินค้านอกรอบ
           </div>
           <div className="border-l-4 border-red-500 pl-4">
             <div className="flex items-center space-x-2">
