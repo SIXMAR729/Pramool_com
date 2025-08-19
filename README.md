@@ -29,21 +29,21 @@ Icons: Heroicons
 คุณสามารถ Clone โปรเจกต์นี้เพื่อนำไปพัฒนาต่อหรือศึกษาโค้ดได้ตามขั้นตอนต่อไปนี้
 
 Clone a repository:
-
+```bash
 git clone https://github.com/SIXMAR729/Pramool_com.git
-
+```
 เข้าไปยังโฟลเดอร์ของโปรเจกต์:
-
+```bash
 cd Pramool_com
-
+```
 ติดตั้ง Dependencies:
-
+```bash
 npm install
-
+```
 รันโปรเจกต์ในโหมดพัฒนา (Development Mode):
-
-npm run dev
-
+```bash
+npm run start
+```
 จากนั้นเปิดเบราว์เซอร์แล้วไปที่ http://localhost:5173 (หรือ Port อื่นๆ ที่แสดงใน Terminal)
 
 รักและเคารพ อ. หยง ประมูล ตลอดไป
